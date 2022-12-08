@@ -1,0 +1,693 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <cmath>
+#include <ctime>
+#include <algorithm>
+#include <map>
+#include <utility>
+#include <string>
+#include <time.h>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <limits>
+
+using namespace std;
+
+void featuresearch(vector<vector<float> > data, int features){
+    for (int i = 0 ; i < data.size(); i++){ 
+        for (int j = 0; j < features; j++){   
+            cout << data.at(i).at(j) << " ";     
+        }
+        cout << endl;   
+    }
+    cout << "-----------------------------" << endl;
+}
+void printfloat(vector<float> a){
+        for (int i = 0; i < a.size(); i++){
+            cout << a.at(i) << endl;
+        }
+}
+
+vector<float>correct(vector<vector<float> > f){
+    vector<float> b;
+    for (int i = 0; i < f.size(); i++){
+        b.push_back(f.at(i).at(0));
+    }
+    return b;
+}
+
+float nearestneighbor(vector<vector<float> > data, int features,int i,int a){
+
+        float val = 0; //nearest neighbor distance
+        int spot; //nearest neighbor location in array
+        val = numeric_limits<float>::infinity();
+        float euclidean;
+        
+            spot = i;
+            val = numeric_limits<float>::infinity();
+           
+            int featurespot = a + 1;
+                cout << "feature spot " << featurespot << endl;
+                vector<float> temp = data.at(i);
+                cout << temp.at(0) << endl;
+                float compareval = data.at(i).at(featurespot);
+                cout << "compareval " << compareval << endl;
+                
+                for(int j = 0; j < data.size(); j++){
+                    
+                    float label = data.at(j).at(0); //class label
+                    cout << "label is = " << label << endl;
+                    euclidean = 0;
+                    
+                    
+                    if(j != spot){
+                   
+                    for (int k = 0; k <= features; k++){
+                        
+                        if(data.at(j).at(k) == 1 || data.at(j).at(k) == 2){
+
+                        cout << "test" << endl;
+                        }
+                        else{
+                        euclidean = euclidean + pow(data.at(k).at(j) - compareval,2);
+                        cout << "first " << data.at(k).at(j) << endl;
+                        cout << "second " << compareval << endl;
+                        //cout << temp.at(k) << " ";
+                        
+                        cout << "euclidean " << euclidean << endl;
+                       
+                        }
+                    }
+                       
+                        cout << "val = " << val << endl;
+                    if ( euclidean < val && j != i){
+                     
+                        cout << "J value = " << j << endl;
+                        
+                        val = euclidean;
+                        cout << "curr val "  << val << endl;
+                        spot = data.at(j).at(0);
+                        cout << "class " << spot << endl;
+                    }
+                    else if (j == i){
+                   
+                     cout << "curr val "  << val << endl;
+                    
+                    cout << "class " << spot << endl;
+                    continue;
+                    }
+
+                        
+                    }
+                    else{
+                        cout << "same " << endl;
+                       
+                    }
+                    cout << endl;
+                    cout << "===============================" << endl;
+                    
+                }
+
+        cout << "class returned " << spot << endl;
+        cout << "===============================" << endl;
+    return spot; //filler
+}
+double comp (vector<float>first,vector<float>second){
+    double v;
+
+    for(int i = 0; i < first.size(); i++){
+        if (first.at(i) == second.at(i)){
+            v = v + 1;
+            cout << "v = " << v << endl;
+        }
+    }
+    
+    return v;
+}
+
+pair<vector<int>,double > nn(vector<vector<float> > data, int features,vector<float>correct,vector<int>featureset,vector<int>best,double highest){
+    
+    vector<float>check;
+  
+    float val = 0; //nearest neighbor distance     
+    val = numeric_limits<float>::infinity();
+    float euclidean;     
+
+ 
+    int i = 1;
+    int arr = 0;
+
+    int last = 0;
+    
+
+    //while (last < data.size()){
+
+    double currhighestval = 0;
+    double ratechecker = 0;
+    int highclassval = 0;
+
+    while (i <= features){
+
+
+        if(find(featureset.begin(), featureset.end(),i) != featureset.end()){
+      
+            i++;
+        }
+        
+        else{
+       
+        check.clear();
+        //cout << "data.size() " << data.size() << endl;
+        for (int loop = 0; loop < data.size(); loop++){
+        
+        euclidean = 0;
+
+        float temp = data.at(loop).at(i);
+
+        //cout << "temp " << temp << endl;
+
+        int spot = 0;
+        int featurespot = 0;
+        int positionfound = 0;
+            while(spot < data.size()){
+                euclidean = 0;
+
+                float value = data.at(spot).at(i);
+
+               // cout << "loop counter " << loop << endl;
+                //cout << "value " << value << endl;
+               // cout << "arr val " << arr << endl;
+               if (value == temp){
+                //cout << "same values" << endl;
+               }
+               else{
+                euclidean = euclidean + pow(data.at(spot).at(i) - temp,2);
+         //       cout << "euclidean value = " << euclidean << endl;
+                //cout << "spot = " << spot << endl;
+                if(euclidean < val && value != temp){
+                val = euclidean;
+                positionfound = spot;
+                
+                //cout << "position val loop = " << positionfound << endl;
+                //cout << "inner val = " << val << endl;
+                
+            }
+               }
+                arr++;
+                spot++;
+               
+        }
+        
+      //  cout << "curr val = " << val << endl;
+      //  cout << "position val = " << positionfound << endl;
+        float classdesc;
+        classdesc = data.at(positionfound).at(0);
+        
+      //  cout << "classdesc = " << classdesc << endl;
+        check.push_back(classdesc);
+        float compare = val; 
+        //cout << "value to compare = " << compare << endl;
+        arr = 0;
+        //featureline++;
+        val = numeric_limits<float>::infinity();
+       
+        //rate = static_cast<double>(accuracy);
+        //rate = comp (check,data);
+        
+       // rate = (rate * 100)/data.at(0).size() ;
+
+//        cout << "rate = " << rate << endl;
+
+    }
+
+    double rate = 0;
+    // for (int a = 0; a < check.size(); a++){
+    //         cout << check.at(a) << " ";
+    //     }
+    //     cout << endl;
+
+    // for (int a = 0; a < correct.size(); a++){
+    //         cout << correct.at(a) << " ";
+    //     }
+    //     cout << endl;
+
+    double v = 0;
+
+    //check contains how many are right
+    //cout << check.size() << endl;
+    for(int b = 0; b < correct.size(); b++){
+        if (correct.at(b) == check.at(b)){
+            v = v + 1;
+            //cout << "v = " << v << endl;
+        }
+    }
+
+    cout << v << endl;
+    cout << "check " << check.size() << endl;
+    cout << "correct " << correct.size() << endl;
+    //rate = v / ;
+       // cout << "rate " << rate << endl;
+        //rate = comp(correct,check);
+    //cout << data.size();
+    //rate = v/data.size();
+
+    rate = v/data.size();
+    rate = rate*100;
+    cout << "rate = " << rate  << "%"<< endl;
+    
+
+    if(ratechecker <= rate){
+        ratechecker = rate;
+        highclassval = i;
+    }
+   // cout << "feature " << highclassval << endl;
+
+    cout << "====================================================" << endl;
+    //ccout << "here" << endl;
+    i++;
+    
+    //cout << "here" << endl;
+        }
+    }
+     //   cout << "highclassval " << highclassval << endl;
+        if(find(featureset.begin(), featureset.end(),highclassval) != featureset.end()){
+      //      cout << "feature already exists in the set of values" << endl;
+        }
+        else{
+            featureset.push_back(highclassval);
+            for (int y = 0; y < featureset.size(); y++)
+            cout << featureset.at(y) << " ";
+
+            cout << endl;
+        }
+        //last++;
+
+   // }
+
+     if(highest > ratechecker){
+         cout << "accuracy lowered" << endl;
+     }
+
+     else{
+        highest = ratechecker;
+    return make_pair(featureset,highest);
+    }
+   // cout << "here" << endl;
+
+    return make_pair(featureset,highest);
+
+}   
+
+
+
+
+
+//we can use kfold cross validation to calculate the accuracy of our data
+//kfold will just return accuracy
+void kfold_cross_validation(vector<vector<float> > data, int feats,vector<float> correct,int input){
+
+        //float accuracy = 0;
+        double rate;
+        float check = 0;
+        vector<int> bestset;
+        vector<int>currset;
+        double accuracy = 0;
+        double top = 0;
+        pair<vector<int>,double > temp;
+        
+        if(input == 1){
+            int a = 0;
+            while (a < feats){
+              temp = nn(data,feats,correct,currset,bestset,accuracy);
+              currset = temp.first;
+              accuracy = temp.second;
+
+              if (top < accuracy){
+                top = accuracy;
+                bestset = currset;
+              }
+              cout << "----------------------------------------------" << endl;
+            a++;
+            }
+            for (int i = 0; i < bestset.size(); i++){
+                cout << "best feature subset is " << bestset.at(i) << " " << endl;
+            }
+            cout << "best accuracy = " << top << endl;
+        }
+
+        // else if (input == 2){
+        //     int b = 0;
+        //     int spot = 1;
+        //     while(b < feats){
+        //         temp = bn(data,feats,correct,currset,bestset,accuracy,spot);
+        //         b++;
+        //         spot++;
+        //         cout << "----------------------------------------------" << endl;
+        //     }
+        // }
+        //     temp.push_back(check);
+        
+        
+        // //rate = static_cast<double>(accuracy);
+        //rate = comp (temp,data);
+        
+       // rate = (rate * 100)/data.at(0).size() ;
+
+        // return rate;
+}
+
+
+
+void leave_one_out_cross_validation(vector<vector<float> > dat, int fea,vector<float> cor,int inpu){
+
+        vector<float>featureline;
+        float accurate; 
+        vector<float>set;
+        //for (int m = 0; m < dat.size(); m++){
+           kfold_cross_validation(dat,fea,cor,inpu);
+        //}
+       // cout << "accuracy = " << accurate << endl;
+
+}
+
+vector<vector<float> > seperate(vector<float> x){
+    vector<vector<float> > v;
+    vector<float> temp;
+    int i = 0;
+    while( i < x.size()){
+        if (i == 0){
+            temp.push_back(x.at(i));
+            //cout << "i " << i;
+            i++;
+        }
+        else if (x.at(i) == 1){
+            //printfloat(temp);
+            v.push_back(temp);
+            
+            temp.clear();
+            temp.push_back(x.at(i));
+            //cout << "i " << i;
+            i++;
+        }
+        else if (x.at(i) == 2){
+            //printfloat(temp);
+            v.push_back(temp);
+            temp.clear();
+            temp.push_back(x.at(i));
+            //cout << "i " << i;
+            i++;
+        }
+        else{
+           temp.push_back(x.at(i));
+           //cout << "i " << i;
+           i++;
+        }
+    }
+    cout << "------------" << endl;
+    //printfloat(temp);
+    v.push_back(temp);
+    return v;
+}
+
+
+int fe(vector<float>b){
+    int c = 0;
+    for (int i = 1; i < b.size(); i++){
+        if (b.at(i) == 1 || b.at(i) == 2){
+            return c;
+        }
+        else{
+            c = c + 1;
+        }
+    }
+    return 0;
+}
+int main()
+{
+    //rows will be for instances
+    //features are the amount after the class 1,2
+    string userinput;
+    vector<float> vals;
+    vector<vector<float> > vec; 
+    int size;
+    int feat;
+    //cout << "Selection Algorithm for nearest neighbor" << endl;
+    cout << "Enter the text file for search" << endl;
+    cin >> userinput;
+
+    cout << "this is the current text file being looked at " << userinput << endl;
+    
+    ifstream read; //reading from the files
+    
+    read.open(userinput.c_str());
+    
+
+
+    if (read.fail()){
+        cout << "here, file failed to open" << endl;
+    }
+    else{
+
+    
+        string line;
+        //for seperating maybe try two vectors
+        while (getline(read,line)){ //reads in the line
+                //use float for floating numbers and stringstream for reading in line by line inputs
+                float val;
+                stringstream s(line); //seperate the vals from each other
+                while(s >> val){ //store individual values
+                    if (val == 2){
+                        //cout << "float val = 2" << endl;
+                    }
+                    else if (val == 1){
+                        //cout << "float val = 1" << endl;
+                    }
+                    vals.push_back(val);
+                    //cout << "val size = " << vals.size() << endl;
+                  
+                }
+                
+                //vec.push_back(vals);
+                size = size + 1;
+        }
+    }
+    read.close();
+
+
+    //cout << vals.size() << endl;
+    //feat = vec.front().size()-1;
+    feat = fe(vals);
+
+
+    printfloat(vals);
+    cout << "features = " << feat << endl;
+    cout << "size = " << size << endl;
+    cout << "vals size = " << vals.size() << endl;
+    //cout << "vec size = " << vec.size() << endl;
+    
+    cout << "-------------------------------------------------" << endl;
+    int fsize = feat + 1;
+    //kfold_cross_validation(vec);
+    
+    
+    vec = seperate(vals);
+
+    cout << "vec size = " << vec.size() << endl;
+
+
+
+    int rows = vec.size();
+
+    
+    //featuresearch(vec,fsize);
+    //cout << vec.at(4).at(0) << endl;
+    //cout << vec.at(0).at(0) << endl;
+    //float testing = nearestneighbor(vec,feat);
+    vector<float> test = correct(vec);
+    //printfloat(test);
+    //cout << "testing : " << kfold_cross_validation(vec,feat,test) << endl;
+    // vector<float> test = correct(vec);
+    // printfloat(test);
+    cout << endl << endl << endl<< endl;
+    cout << "Selection Algorithm for nearest neighbor" << endl;
+    int in;
+    cin >> in;
+    if (in == 1){
+        cout << "forward selection" << endl;
+        leave_one_out_cross_validation(vec,feat,test,in);
+       // cout << 20/4 << endl;
+    }
+
+     else if (in == 2){
+         cout << "backward elimination" << endl;
+         leave_one_out_cross_validation(vec,feat,test,in);
+     }
+
+    return 0;
+}
+
+pair<vector<int>,double > bn(vector<vector<float> > data, int features,vector<float>correct,vector<int>featureset,vector<int>best,double highest,int looking){
+    
+    vector<float>check;
+
+    float val = 0; //nearest neighbor distance     
+    val = numeric_limits<float>::infinity();
+    float euclidean;     
+
+    int featureline;
+    int i = 1;
+    int arr = 0;
+
+    int last = 0;
+
+    double currhighestval = 0;
+    double ratechecker = 0;
+    int highclassval = 0;
+
+
+    //outer loop to run through the loop each feature
+    while (i < data.size()){
+
+
+        if (looking == i){
+            cout << "emitted " << looking << endl;
+            i++;
+        }
+        else{
+
+
+
+
+
+
+
+        // if(find(featureset.begin(), featureset.end(),i) != featureset.end()){
+        //     cout << "feature already added" << endl;
+        //     cout << "here" << endl;
+        //     i++;
+        // }
+        
+       // else{
+             
+        check.clear();
+    
+        for (int loop = 0; loop < data.size(); loop++){
+        
+        euclidean = 0;
+
+        //choose feature to exclude
+
+        float temp = data.at(loop).at(i);
+
+        //cout << "temp val " << temp << endl;
+
+        int spot = 0;
+        int featurespot = 0;
+        int positionfound = 0;
+            while(spot < data.size()){
+                euclidean = 0;
+                featureline = 1;
+                //cout << featureline << endl;
+                float value = data.at(spot).at(i);
+           
+               if (value == temp){
+                //cout << "same values" << endl;
+               }
+               else{
+                euclidean = euclidean + pow(data.at(spot).at(i) - temp,2);
+                cout << "euclidean value = " << euclidean << endl;
+                //cout << "spot = " << spot << endl;
+                if(euclidean < val && value != temp){
+                val = euclidean;
+                positionfound = spot;
+                
+
+            }
+               }
+                arr++;
+                spot++;
+               
+        }
+        
+
+        cout << "curr val = " << val << endl;
+        cout << "position val = " << positionfound << endl;
+
+        float classdesc;
+        classdesc = data.at(positionfound).at(0);
+        
+        cout << "classdesc = " << classdesc << endl;
+        check.push_back(classdesc);
+        float compare = val; 
+        //cout << "value to compare = " << compare << endl;
+        arr = 0;
+        featureline++;
+        val = numeric_limits<float>::infinity();
+
+    }
+
+    double rate = 0;
+    // for (int a = 0; a < check.size(); a++){
+    //         cout << check.at(a) << " ";
+    //     }
+        //cout << endl;
+
+    // for (int a = 0; a < correct.size(); a++){
+    //         cout << correct.at(a) << " ";
+    //     }
+    //     cout << endl;
+
+    double v = 0;
+     for(int b = 0; b < correct.size(); b++){
+         if (correct.at(b) == check.at(b)){
+             v = v + 1;
+       
+         }
+     }
+
+    rate = v;
+    rate = (rate * 100)/data.at(0).size();
+    cout << "rate = " << rate  << "%"<< endl;
+    
+    if(ratechecker <= rate){
+        ratechecker = rate;
+        highclassval = i;
+    }
+    cout << "feature " << highclassval << endl;
+
+
+    cout << "====================================================" << endl;
+    i++;
+
+      }
+    }
+
+        cout << "highclassval " << highclassval << endl;
+
+
+        if(find(featureset.begin(), featureset.end(),highclassval) != featureset.end()){
+            cout << "feature already exists in the set of values" << endl;
+        }
+        
+        else{
+            featureset.push_back(highclassval);
+            for (int y = 0; y < featureset.size(); y++)
+            cout << featureset.at(y) << " ";
+
+            cout << endl;
+        }
+        
+     if(highest > ratechecker){
+         cout << "accuracy lowered" << endl;
+     }
+
+     else{
+        highest = ratechecker;
+    return make_pair(featureset,highest);
+    }
+
+    return make_pair(featureset,highest);
+
+}   
